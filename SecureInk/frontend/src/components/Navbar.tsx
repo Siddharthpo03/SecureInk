@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 interface NavbarProps {
   openPricing: () => void;
@@ -71,10 +72,23 @@ const Navbar = ({ openPricing }: NavbarProps) => {
 
         {/* Actions */}
         <div className="flex items-center gap-4">
-          <button className={navLink}>Login</button>
-          <button className="cursor-pointer bg-blue-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-blue-700 transition-all duration-200">
+          <Link to="/login" className={navLink}>
+            Login
+          </Link>
+          <Link
+            to="/register"
+            className="
+            bg-blue-600
+            text-white
+            px-5
+            py-2
+            rounded-lg
+            font-medium
+            hover:bg-blue-700
+            transition-all"
+          >
             Get Started
-          </button>
+          </Link>
         </div>
       </div>
     </nav>
