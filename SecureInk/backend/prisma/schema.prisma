@@ -9,16 +9,33 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  fullName   String
-  email      String   @unique
-  password   String
+  id       String @id @default(uuid())
+  fullName String
+  email    String @unique
+  password String
 
-  isVerified Boolean  @default(false)
+  isVerified Boolean @default(false)
 
-  otp        String?
-  otpExpiry  DateTime?
+  otp       String?
+  otpExpiry DateTime?
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  documents Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Document {
+  id String @id @default(uuid())
+
+  title   String
+  fileUrl String
+
+  status String @default("PENDING")
+
+  ownerId String
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -5,6 +5,8 @@ import prisma from "../config/prisma";
 import { generateOTP } from "../utils/otp";
 import { generateToken } from "../utils/jwt";
 
+import { authenticate, AuthRequest } from "../middleware/auth.middleware";
+
 const router = Router();
 
 router.post("/register", async (req, res) => {
@@ -158,6 +160,23 @@ router.post("/login", async (req, res) => {
       message: "Server Error",
     });
   }
+});
+
+router.get("/me", authenticate, async (req: AuthRequest, res) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: req.userId,
+    },
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      isVerified: true,
+      createdAt: true,
+    },
+  });
+
+  return res.json(user);
 });
 
 export default router;

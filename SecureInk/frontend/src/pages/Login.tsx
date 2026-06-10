@@ -1,9 +1,54 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Login failed");
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+
+      navigate("/dashboard");
+    } catch (err) {
+      console.error(err);
+
+      setError("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6 py-10">
@@ -22,10 +67,12 @@ const Login = () => {
           Sign in to continue using SecureInk
         </p>
 
-        <form className="mt-8 space-y-5">
+        <form onSubmit={handleLogin} className="mt-8 space-y-5">
           <input
             type="email"
             placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="
               w-full
               border
@@ -43,6 +90,8 @@ const Login = () => {
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="
                 w-full
                 border
@@ -73,6 +122,8 @@ const Login = () => {
             </button>
           </div>
 
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
           <div className="flex justify-between items-center">
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" />
@@ -92,6 +143,8 @@ const Login = () => {
           </div>
 
           <button
+            type="submit"
+            disabled={loading}
             className="
               w-full
               bg-blue-600
@@ -101,9 +154,10 @@ const Login = () => {
               font-semibold
               hover:bg-blue-700
               transition
+              disabled:opacity-50
             "
           >
-            Login
+            {loading ? "Signing In..." : "Login"}
           </button>
         </form>
 

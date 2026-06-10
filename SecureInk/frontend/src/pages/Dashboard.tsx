@@ -1,71 +1,58 @@
-import DashboardLayout from "../layouts/DashboardLayout";
+import { useEffect, useState } from "react";
+import { apiFetch } from "../services/api";
 
-const Dashboard = () => {
+interface User {
+  id: string;
+  fullName: string;
+  email: string;
+}
+
+interface Document {
+  id: string;
+  title: string;
+  status: string;
+}
+
+export default function Dashboard() {
+  const [user, setUser] = useState<User | null>(null);
+  const [documents, setDocuments] = useState<Document[]>([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const userData = await apiFetch("/auth/me");
+      const docsData = await apiFetch("/documents");
+
+      setUser(userData);
+      setDocuments(docsData);
+    };
+
+    loadData();
+  }, []);
+
   return (
-    <DashboardLayout>
-      <div className="p-8">
-        <h1 className="text-4xl font-bold">Welcome Back 👋</h1>
+    <div className="p-6">
+      <h1 className="text-3xl font-bold">Welcome {user?.fullName}</h1>
 
-        <p className="mt-2 text-slate-500">
-          Here's an overview of your documents.
-        </p>
-
-        {/* Stats */}
-
-        <div className="grid md:grid-cols-4 gap-6 mt-10">
-          <div className="bg-white rounded-3xl p-6 shadow-sm">
-            <h3 className="text-slate-500">Total Documents</h3>
-
-            <p className="text-4xl font-bold mt-3">12</p>
-          </div>
-
-          <div className="bg-white rounded-3xl p-6 shadow-sm">
-            <h3 className="text-slate-500">Pending Signatures</h3>
-
-            <p className="text-4xl font-bold mt-3">3</p>
-          </div>
-
-          <div className="bg-white rounded-3xl p-6 shadow-sm">
-            <h3 className="text-slate-500">Signed Documents</h3>
-
-            <p className="text-4xl font-bold mt-3">9</p>
-          </div>
-
-          <div className="bg-white rounded-3xl p-6 shadow-sm">
-            <h3 className="text-slate-500">Audit Events</h3>
-
-            <p className="text-4xl font-bold mt-3">27</p>
-          </div>
+      <div className="mt-6 grid grid-cols-3 gap-4">
+        <div className="bg-zinc-900 p-4 rounded-xl">
+          <h2>Total Documents</h2>
+          <p className="text-3xl font-bold">{documents.length}</p>
         </div>
 
-        {/* Recent Documents */}
+        <div className="bg-zinc-900 p-4 rounded-xl">
+          <h2>Pending</h2>
+          <p className="text-3xl font-bold">
+            {documents.filter((doc) => doc.status === "PENDING").length}
+          </p>
+        </div>
 
-        <div className="mt-10 bg-white rounded-3xl p-6 shadow-sm">
-          <h2 className="text-2xl font-semibold">Recent Documents</h2>
-
-          <div className="mt-6 space-y-4">
-            <div className="flex justify-between border-b pb-4">
-              <span>Employment_Agreement.pdf</span>
-
-              <span className="text-yellow-600">Pending</span>
-            </div>
-
-            <div className="flex justify-between border-b pb-4">
-              <span>NDA.pdf</span>
-
-              <span className="text-green-600">Signed</span>
-            </div>
-
-            <div className="flex justify-between">
-              <span>Vendor_Contract.pdf</span>
-
-              <span className="text-green-600">Signed</span>
-            </div>
-          </div>
+        <div className="bg-zinc-900 p-4 rounded-xl">
+          <h2>Completed</h2>
+          <p className="text-3xl font-bold">
+            {documents.filter((doc) => doc.status === "COMPLETED").length}
+          </p>
         </div>
       </div>
-    </DashboardLayout>
+    </div>
   );
-};
-
-export default Dashboard;
+}
