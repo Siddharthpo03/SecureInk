@@ -18,3 +18,21 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
 
   return response.json();
 };
+
+export const uploadDocument = async (file: File) => {
+  const token = getToken();
+
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  const response = await fetch(`${API_URL}/documents/upload`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  return response.json();
+};
