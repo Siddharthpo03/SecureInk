@@ -142,4 +142,57 @@ router.get("/:id/view", authenticate, async (req: AuthRequest, res) => {
     });
   }
 });
+
+router.delete("/:id", authenticate, async (req: AuthRequest, res) => {
+  try {
+    const id = req.params.id;
+
+    if (!id || Array.isArray(id)) {
+      return res.status(400).json({
+        message: "Invalid document id",
+      });
+    }
+
+    const document = await prisma.document.findFirst({
+      where: {
+        id,
+        ownerId: req.userId,
+      },
+    });
+
+    if (!document) {
+      return res.status(404).json({
+        message: "Document not found",
+      });
+    }
+
+    const { error } = await supabase.storage
+      .from("documents")
+      .remove([document.fileUrl]);
+
+    if (error) {
+      console.error(error);
+
+      return res.status(500).json({
+        message: "Failed to delete file",
+      });
+    }
+
+    await prisma.document.delete({
+      where: {
+        id,
+      },
+    });
+
+    return res.json({
+      message: "Document deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
 export default router;

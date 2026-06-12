@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 
 interface NavbarProps {
@@ -75,17 +74,19 @@ const Navbar = ({ openPricing }: NavbarProps) => {
           <Link to="/login" className={navLink}>
             Login
           </Link>
+
           <Link
             to="/register"
             className="
-            bg-blue-600
-            text-white
-            px-5
-            py-2
-            rounded-lg
-            font-medium
-            hover:bg-blue-700
-            transition-all"
+              bg-blue-600
+              text-white
+              px-5
+              py-2
+              rounded-lg
+              font-medium
+              hover:bg-blue-700
+              transition-all
+            "
           >
             Get Started
           </Link>

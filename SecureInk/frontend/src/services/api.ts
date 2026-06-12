@@ -23,7 +23,6 @@ export const uploadDocument = async (file: File) => {
   const token = getToken();
 
   const formData = new FormData();
-
   formData.append("file", file);
 
   const response = await fetch(`${API_URL}/documents/upload`, {
@@ -35,4 +34,10 @@ export const uploadDocument = async (file: File) => {
   });
 
   return response.json();
+};
+
+export const deleteDocument = async (documentId: string) => {
+  return apiFetch(`/documents/${documentId}`, {
+    method: "DELETE",
+  });
 };

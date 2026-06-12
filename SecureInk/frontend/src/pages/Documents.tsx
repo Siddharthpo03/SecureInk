@@ -11,9 +11,7 @@ interface Document {
 export default function Documents() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loadingId, setLoadingId] = useState("");
-
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
   const [uploading, setUploading] = useState(false);
 
   const loadDocuments = async () => {
@@ -56,34 +54,6 @@ export default function Documents() {
       alert("Failed to open document");
     } finally {
       setLoadingId("");
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "PENDING":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
-            Pending
-          </span>
-        );
-
-      case "SIGNED":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-            Signed
-          </span>
-        );
-
-      case "REJECTED":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
-            Rejected
-          </span>
-        );
-
-      default:
-        return null;
     }
   };
 
@@ -145,20 +115,19 @@ export default function Documents() {
                 <div className="mt-2 flex gap-4 text-sm text-slate-500">
                   <span
                     className={`
-    px-3
-    py-1
-    rounded-full
-    text-xs
-    font-semibold
-
-    ${
-      doc.status === "PENDING"
-        ? "bg-yellow-100 text-yellow-700"
-        : doc.status === "SIGNED"
-          ? "bg-green-100 text-green-700"
-          : "bg-red-100 text-red-700"
-    }
-  `}
+                      px-3
+                      py-1
+                      rounded-full
+                      text-xs
+                      font-semibold
+                      ${
+                        doc.status === "PENDING"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : doc.status === "SIGNED"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                      }
+                    `}
                   >
                     {doc.status}
                   </span>
