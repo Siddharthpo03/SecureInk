@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { apiFetch, uploadDocument } from "../services/api";
+import { apiFetch, uploadDocument, deleteDocument } from "../services/api";
 
 interface Document {
   id: string;
@@ -54,6 +54,24 @@ export default function Documents() {
       alert("Failed to open document");
     } finally {
       setLoadingId("");
+    }
+  };
+
+  const handleDelete = async (documentId: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this document?",
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteDocument(documentId);
+
+      await loadDocuments();
+    } catch (error) {
+      console.error(error);
+
+      alert("Failed to delete document");
     }
   };
 
@@ -138,20 +156,36 @@ export default function Documents() {
                 </div>
               </div>
 
-              <button
-                onClick={() => viewDocument(doc.id)}
-                disabled={loadingId === doc.id}
-                className="
-                  bg-blue-600
-                  text-white
-                  px-4
-                  py-2
-                  rounded-lg
-                  hover:bg-blue-700
-                "
-              >
-                {loadingId === doc.id ? "Opening..." : "View PDF"}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => viewDocument(doc.id)}
+                  disabled={loadingId === doc.id}
+                  className="
+      bg-blue-600
+      text-white
+      px-4
+      py-2
+      rounded-lg
+      hover:bg-blue-700
+    "
+                >
+                  {loadingId === doc.id ? "Opening..." : "View PDF"}
+                </button>
+
+                <button
+                  onClick={() => handleDelete(doc.id)}
+                  className="
+                    bg-red-600
+                    text-white
+                    px-4
+                    py-2
+                    rounded-lg
+                    hover:bg-red-700
+                  "
+                >
+                  Delete
+                </button>
+              </div>
             </div>
           ))
         )}

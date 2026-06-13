@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import Documents from "./pages/Documents";
 import AuditLogs from "./pages/AuditLogs";
 import Settings from "./pages/Settings";
+import PDFViewer from "./pages/PDFViewer";
 
 function App() {
   return (
@@ -25,6 +26,8 @@ function App() {
         <Route path="/audit" element={<AuditLogs />} />
 
         <Route path="/settings" element={<Settings />} />
+
+        <Route path="/viewer" element={<PDFViewer />} />
       </Routes>
     </BrowserRouter>
   );
