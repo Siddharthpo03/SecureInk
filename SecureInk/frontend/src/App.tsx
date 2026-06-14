@@ -27,7 +27,7 @@ function App() {
 
         <Route path="/settings" element={<Settings />} />
 
-        <Route path="/viewer" element={<PDFViewer />} />
+        <Route path="/viewer/:id" element={<PDFViewer />} />
       </Routes>
     </BrowserRouter>
   );

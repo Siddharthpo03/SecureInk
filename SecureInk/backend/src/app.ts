@@ -3,6 +3,7 @@ import cors from "cors";
 
 import authRoutes from "./routes/auth.routes";
 import documentRoutes from "./routes/document.routes";
+import signatureRoutes from "./routes/signature.routes";
 
 const app = express();
 
@@ -15,5 +16,6 @@ app.get("/", (_, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/documents", documentRoutes);
+app.use("/api/signatures", signatureRoutes);
 
 export default app;

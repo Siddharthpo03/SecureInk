@@ -34,8 +34,27 @@ model Document {
   status String @default("PENDING")
 
   ownerId String
-  owner   User   @relation(fields: [ownerId], references: [id])
+  owner   User @relation(fields: [ownerId], references: [id])
+
+  signatureFields SignatureField[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model SignatureField {
+  id String @id @default(uuid())
+
+  page Int
+
+  x Float
+  y Float
+
+  width Float @default(180)
+  height Float @default(60)
+
+  documentId String
+  document Document @relation(fields: [documentId], references: [id])
+
+  createdAt DateTime @default(now())
 }
