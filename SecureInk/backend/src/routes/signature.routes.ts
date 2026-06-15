@@ -60,4 +60,28 @@ router.get("/:documentId", authenticate, async (req: AuthRequest, res) => {
   }
 });
 
+router.put("/:id", authenticate, async (req: AuthRequest, res) => {
+  try {
+    const { x, y } = req.body;
+
+    const field = await prisma.signatureField.update({
+      where: {
+        id: req.params.id as string,
+      },
+      data: {
+        x,
+        y,
+      },
+    });
+
+    return res.json(field);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
+
 export default router;

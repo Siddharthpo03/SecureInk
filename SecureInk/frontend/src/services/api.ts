@@ -10,8 +10,12 @@ export const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
+      ...(options.body instanceof FormData
+        ? {}
+        : {
+            "Content-Type": "application/json",
+          }),
       ...(options.headers || {}),
     },
   });
@@ -23,6 +27,7 @@ export const uploadDocument = async (file: File) => {
   const token = getToken();
 
   const formData = new FormData();
+
   formData.append("file", file);
 
   const response = await fetch(`${API_URL}/documents/upload`, {
@@ -39,5 +44,15 @@ export const uploadDocument = async (file: File) => {
 export const deleteDocument = async (documentId: string) => {
   return apiFetch(`/documents/${documentId}`, {
     method: "DELETE",
+  });
+};
+
+export const updateSignatureField = (id: string, x: number, y: number) => {
+  return apiFetch(`/signatures/${id}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      x,
+      y,
+    }),
   });
 };
