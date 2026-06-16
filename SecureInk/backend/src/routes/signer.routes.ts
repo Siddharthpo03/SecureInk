@@ -6,7 +6,7 @@ const router = Router();
 
 router.post("/", authenticate, async (req: AuthRequest, res) => {
   try {
-    const { documentId, page, x, y } = req.body;
+    const { email, documentId } = req.body;
 
     const document = await prisma.document.findFirst({
       where: {
@@ -21,23 +21,21 @@ router.post("/", authenticate, async (req: AuthRequest, res) => {
       });
     }
 
-    const signatureField = await prisma.signatureField.create({
+    const signer = await prisma.signer.create({
       data: {
+        email,
         documentId,
-        page,
-        x,
-        y,
       },
     });
 
     await prisma.auditLog.create({
       data: {
-        action: "SIGNATURE_FIELD_CREATED",
-        documentId,
+        action: "DOCUMENT_UPLOADED",
+        documentId: document.id,
       },
     });
 
-    return res.status(201).json(signatureField);
+    return res.status(201).json(signer);
   } catch (error) {
     console.error(error);
 
@@ -49,46 +47,13 @@ router.post("/", authenticate, async (req: AuthRequest, res) => {
 
 router.get("/:documentId", authenticate, async (req: AuthRequest, res) => {
   try {
-    const documentId = req.params.documentId as string;
-
-    const fields = await prisma.signatureField.findMany({
+    const signers = await prisma.signer.findMany({
       where: {
-        documentId,
+        documentId: req.params.documentId as string,
       },
     });
 
-    return res.json(fields);
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      message: "Server Error",
-    });
-  }
-});
-
-router.put("/:id", authenticate, async (req: AuthRequest, res) => {
-  try {
-    const { x, y } = req.body;
-
-    const field = await prisma.signatureField.update({
-      where: {
-        id: req.params.id as string,
-      },
-      data: {
-        x,
-        y,
-      },
-    });
-
-    await prisma.auditLog.create({
-      data: {
-        action: "SIGNATURE_FIELD_UPDATED",
-        documentId: field.documentId,
-      },
-    });
-
-    return res.json(field);
+    return res.json(signers);
   } catch (error) {
     console.error(error);
 

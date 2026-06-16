@@ -37,6 +37,9 @@ model Document {
   owner   User @relation(fields: [ownerId], references: [id])
 
   signatureFields SignatureField[]
+  signers          Signer[]
+  signatures       Signature[]
+  auditLogs        AuditLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -50,11 +53,48 @@ model SignatureField {
   x Float
   y Float
 
-  width Float @default(180)
+  width  Float @default(180)
   height Float @default(60)
 
   documentId String
-  document Document @relation(fields: [documentId], references: [id])
+  document   Document @relation(fields: [documentId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Signer {
+  id String @id @default(uuid())
+
+  email String
+
+  status String @default("PENDING")
+
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Signature {
+  id String @id @default(uuid())
+
+  signerEmail String
+
+  imageUrl String
+
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id String @id @default(uuid())
+
+  action String
+
+  documentId String
+  document   Document @relation(fields: [documentId], references: [id])
 
   createdAt DateTime @default(now())
 }

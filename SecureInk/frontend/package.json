@@ -13,10 +13,12 @@
     "@tailwindcss/vite": "^4.3.0",
     "lucide-react": "^1.17.0",
     "pdfjs-dist": "^5.4.296",
+    "qrcode": "^1.5.4",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-pdf": "^10.4.1",
     "react-router-dom": "^7.17.0",
+    "react-signature-canvas": "^1.1.0-alpha.2",
     "tailwindcss": "^4.3.0"
   },
   "devDependencies": {

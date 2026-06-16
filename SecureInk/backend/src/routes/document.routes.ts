@@ -42,6 +42,13 @@ router.post(
         },
       });
 
+      await prisma.auditLog.create({
+        data: {
+          action: "DOCUMENT_UPLOADED",
+          documentId: document.id,
+        },
+      });
+
       return res.status(201).json({
         message: "Document uploaded successfully",
         document,

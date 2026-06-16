@@ -56,3 +56,17 @@ export const updateSignatureField = (id: string, x: number, y: number) => {
     }),
   });
 };
+
+export const inviteSigner = (email: string, documentId: string) => {
+  return apiFetch("/signers", {
+    method: "POST",
+    body: JSON.stringify({
+      email,
+      documentId,
+    }),
+  });
+};
+
+export const getSigners = (documentId: string) => {
+  return apiFetch(`/signers/${documentId}`);
+};
