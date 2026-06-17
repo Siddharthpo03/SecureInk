@@ -83,83 +83,134 @@ export default function PDFViewer() {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">PDF Viewer</h1>
+    <div className="min-h-screen bg-zinc-950 text-white">
+      <div className="flex">
+        {/* Sidebar */}
+        <div className="w-80 min-h-screen border-r border-zinc-800 bg-zinc-900 p-5">
+          <h1 className="text-2xl font-bold mb-6">Document Workspace</h1>
 
-      <div className="bg-white rounded-xl shadow p-4 mb-6">
-        <h2 className="text-lg font-semibold mb-3">Invite Signer</h2>
+          <div className="bg-zinc-800 rounded-xl p-4 mb-5">
+            <h2 className="font-semibold mb-2">Status</h2>
 
-        <div className="flex gap-2">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="signer@email.com"
-            className="
-              flex-1
+            <span
+              className="
+              bg-yellow-500/20
+              text-yellow-400
+              px-3
+              py-1
+              rounded-full
+              text-sm
+            "
+            >
+              Active
+            </span>
+          </div>
+
+          <div className="bg-zinc-800 rounded-xl p-4 mb-5">
+            <h2 className="font-semibold mb-3">Invite Signer</h2>
+
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="signer@email.com"
+              className="
+              w-full
+              bg-zinc-900
               border
+              border-zinc-700
               rounded-lg
               px-3
               py-2
+              mb-3
             "
-          />
+            />
 
-          <button
-            onClick={handleInviteSigner}
-            className="
+            <button
+              onClick={handleInviteSigner}
+              className="
+              w-full
               bg-blue-600
-              text-white
-              px-4
               py-2
               rounded-lg
               hover:bg-blue-700
             "
-          >
-            Invite
-          </button>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl shadow p-4 mb-6">
-        <h2 className="text-lg font-semibold mb-3">Invited Signers</h2>
-
-        {signers.length === 0 ? (
-          <p className="text-gray-500">No signers invited yet</p>
-        ) : (
-          <div className="space-y-2">
-            {signers.map((signer) => (
-              <div
-                key={signer.id}
-                className="
-                    flex
-                    justify-between
-                    border-b
-                    pb-2
-                  "
-              >
-                <span>{signer.email}</span>
-
-                <span className="text-orange-500 font-medium">
-                  {signer.status}
-                </span>
-              </div>
-            ))}
+            >
+              Invite Signer
+            </button>
           </div>
-        )}
-      </div>
 
-      {pdfUrl && (
-        <div className="relative">
-          <Document
-            file={pdfUrl}
-            onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-          >
-            {Array.from(
-              {
-                length: numPages,
-              },
-              (_, index) => (
-                <div key={index} className="relative mb-6">
+          <div className="bg-zinc-800 rounded-xl p-4 mb-5">
+            <h2 className="font-semibold mb-3">Signers</h2>
+
+            {signers.length === 0 ? (
+              <p className="text-zinc-400 text-sm">No signers yet</p>
+            ) : (
+              <div className="space-y-2">
+                {signers.map((signer) => (
+                  <div
+                    key={signer.id}
+                    className="
+                    bg-zinc-900
+                    p-2
+                    rounded-lg
+                  "
+                  >
+                    <div className="text-sm">{signer.email}</div>
+
+                    <div
+                      className={
+                        signer.status === "SIGNED"
+                          ? "text-green-400 text-xs"
+                          : "text-yellow-400 text-xs"
+                      }
+                    >
+                      {signer.status}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="bg-zinc-800 rounded-xl p-4">
+            <h2 className="font-semibold mb-3">Verification</h2>
+
+            <a
+              href={`/verify/${id}`}
+              target="_blank"
+              className="
+              block
+              text-center
+              bg-green-600
+              py-2
+              rounded-lg
+            "
+            >
+              Verify Document
+            </a>
+          </div>
+        </div>
+
+        {/* PDF Area */}
+        <div className="flex-1 overflow-auto p-6">
+          <h1 className="text-3xl font-bold mb-6">PDF Viewer</h1>
+
+          {pdfUrl && (
+            <Document
+              file={pdfUrl}
+              onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+            >
+              {Array.from({ length: numPages }, (_, index) => (
+                <div
+                  key={index}
+                  className="
+                    relative
+                    mb-8
+                    flex
+                    justify-center
+                  "
+                >
                   <Page pageNumber={index + 1} width={900} />
 
                   {signatureFields
@@ -168,18 +219,18 @@ export default function PDFViewer() {
                       <div
                         key={field.id}
                         className="
-                            absolute
-                            border-2
-                            border-blue-500
-                            bg-blue-100
-                            text-blue-700
-                            text-sm
-                            flex
-                            items-center
-                            justify-center
-                            rounded
-                            font-semibold
-                          "
+                          absolute
+                          border-2
+                          border-blue-500
+                          bg-blue-500/20
+                          text-blue-300
+                          text-sm
+                          flex
+                          items-center
+                          justify-center
+                          rounded
+                          font-semibold
+                        "
                         style={{
                           left: field.x,
                           top: field.y,
@@ -191,11 +242,11 @@ export default function PDFViewer() {
                       </div>
                     ))}
                 </div>
-              ),
-            )}
-          </Document>
+              ))}
+            </Document>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
