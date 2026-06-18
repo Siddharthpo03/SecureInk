@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 import prisma from "../config/prisma";
 import { generateOTP } from "../utils/otp";
 import { generateToken } from "../utils/jwt";
+import { sendOTP } from "../utils/sendMail";
 
 import { authenticate, AuthRequest } from "../middleware/auth.middleware";
 
@@ -47,10 +48,11 @@ router.post("/register", async (req, res) => {
       },
     });
 
+    await sendOTP(email, otp);
+
     return res.status(201).json({
-      message: "User created successfully",
+      message: "Account created. OTP sent to email.",
       userId: user.id,
-      otp, // temporary for testing
     });
   } catch (error) {
     console.error(error);
@@ -177,6 +179,46 @@ router.get("/me", authenticate, async (req: AuthRequest, res) => {
   });
 
   return res.json(user);
+});
+
+router.post("/resend-otp", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const otp = generateOTP();
+
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+
+    await prisma.user.update({
+      where: { email },
+      data: {
+        otp,
+        otpExpiry,
+      },
+    });
+
+    await sendOTP(email, otp);
+
+    return res.json({
+      message: "OTP sent successfully",
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server Error",
+    });
+  }
 });
 
 export default router;

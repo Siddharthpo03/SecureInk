@@ -1,13 +1,18 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 
 const Register = () => {
+  const navigate = useNavigate();
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const checks = useMemo(
     () => ({
@@ -30,25 +35,49 @@ const Register = () => {
     passwordsMatch &&
     acceptedTerms;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isFormValid) return;
 
-    console.log({
-      fullName,
-      email,
-      password,
-    });
+    try {
+      setLoading(true);
+      setError("");
 
-    // API Call later
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName,
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Registration failed");
+        return;
+      }
+
+      navigate(`/verify-otp?email=${encodeURIComponent(email)}`, {
+        replace: true,
+      });
+    } catch (error) {
+      console.error(error);
+
+      setError("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6 py-10">
       <div className="w-full max-w-lg bg-white rounded-3xl shadow-xl p-8">
-        {/* Logo */}
-
         <div className="flex justify-center mb-6">
           <img
             src={logo}
@@ -57,19 +86,13 @@ const Register = () => {
           />
         </div>
 
-        {/* Heading */}
-
         <h1 className="text-4xl font-bold text-center">Create Account</h1>
 
         <p className="text-slate-500 text-center mt-2">
           Start using SecureInk today
         </p>
 
-        {/* Form */}
-
         <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-          {/* Full Name */}
-
           <input
             type="text"
             placeholder="Full Name"
@@ -88,8 +111,6 @@ const Register = () => {
             "
           />
 
-          {/* Email */}
-
           <input
             type="email"
             placeholder="Email"
@@ -107,8 +128,6 @@ const Register = () => {
               focus:ring-blue-500
             "
           />
-
-          {/* Password */}
 
           <div>
             <input
@@ -129,25 +148,21 @@ const Register = () => {
               "
             />
 
-            {/* Strength Meter */}
-
             <div className="mt-4">
               <div className="flex gap-2">
                 {[1, 2, 3, 4].map((bar) => (
                   <div
                     key={bar}
                     className={`
-                      h-2 flex-1 rounded-full
-                      ${strength >= bar ? "bg-green-500" : "bg-slate-200"}
-                    `}
+                        h-2 flex-1 rounded-full
+                        ${strength >= bar ? "bg-green-500" : "bg-slate-200"}
+                      `}
                   />
                 ))}
               </div>
 
               <p className="mt-2 text-sm text-slate-500">Password Strength</p>
             </div>
-
-            {/* Rules */}
 
             <div className="mt-4 text-sm space-y-2">
               <p
@@ -178,8 +193,6 @@ const Register = () => {
             </div>
           </div>
 
-          {/* Confirm Password */}
-
           <div>
             <input
               type="password"
@@ -206,8 +219,6 @@ const Register = () => {
             )}
           </div>
 
-          {/* Terms */}
-
           <label className="flex items-start gap-3">
             <input
               type="checkbox"
@@ -221,11 +232,11 @@ const Register = () => {
             </span>
           </label>
 
-          {/* Submit */}
+          {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <button
             type="submit"
-            disabled={!isFormValid}
+            disabled={!isFormValid || loading}
             className="
               w-full
               bg-blue-600
@@ -239,11 +250,9 @@ const Register = () => {
               disabled:cursor-not-allowed
             "
           >
-            Create Account
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
-
-        {/* Footer */}
 
         <p className="mt-6 text-center text-slate-500">
           Already have an account?{" "}
