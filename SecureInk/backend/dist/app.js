@@ -13,7 +13,10 @@ const sign_routes_1 = __importDefault(require("./routes/sign.routes"));
 const verify_routes_1 = __importDefault(require("./routes/verify.routes"));
 const audit_routes_1 = __importDefault(require("./routes/audit.routes"));
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({
+    origin: ["http://localhost:5173", "https://secure-ink-ivory.vercel.app/"],
+    credentials: true,
+}));
 app.use(express_1.default.json());
 app.get("/", (_, res) => {
     res.send("SecureInk API Running");
