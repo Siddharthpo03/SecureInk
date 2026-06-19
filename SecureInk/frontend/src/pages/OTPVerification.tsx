@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-export const API_URL = import.meta.env.VITE_API_URL;
 
 export default function OTPVerification() {
   const navigate = useNavigate();
@@ -17,16 +16,19 @@ export default function OTPVerification() {
     try {
       setLoading(true);
 
-      const response = await fetch(`${API_URL}/api/auth/verify-otp`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/auth/verify-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            otp,
+          }),
         },
-        body: JSON.stringify({
-          email,
-          otp,
-        }),
-      });
+      );
 
       const data = await response.json();
 
@@ -51,15 +53,18 @@ export default function OTPVerification() {
     try {
       setResending(true);
 
-      const response = await fetch("${API_URL}/api/auth/resend-otp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/auth/resend-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+          }),
         },
-        body: JSON.stringify({
-          email,
-        }),
-      });
+      );
 
       const data = await response.json();
 
