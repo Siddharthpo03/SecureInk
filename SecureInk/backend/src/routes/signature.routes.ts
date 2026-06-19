@@ -98,4 +98,28 @@ router.put("/:id", authenticate, async (req: AuthRequest, res) => {
   }
 });
 
+router.get("/:documentId", authenticate, async (req, res) => {
+  try {
+    const documentId = req.params.documentId as string;
+
+    console.log("DOCUMENT ID:", documentId);
+
+    const fields = await prisma.signatureField.findMany({
+      where: {
+        documentId,
+      },
+    });
+
+    console.log("FIELDS:", fields);
+
+    return res.json(fields);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
+
 export default router;

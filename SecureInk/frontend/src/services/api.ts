@@ -70,3 +70,7 @@ export const inviteSigner = (email: string, documentId: string) => {
 export const getSigners = (documentId: string) => {
   return apiFetch(`/signers/${documentId}`);
 };
+
+export const getSignatures = (documentId: string) => {
+  return apiFetch(`/sign/${documentId}`);
+};

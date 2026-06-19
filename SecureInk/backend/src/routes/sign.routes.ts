@@ -51,4 +51,25 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.get("/:documentId", async (req, res) => {
+  try {
+    const signatures = await prisma.signature.findMany({
+      where: {
+        documentId: req.params.documentId,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return res.json(signatures);
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      message: "Server Error",
+    });
+  }
+});
+
 export default router;

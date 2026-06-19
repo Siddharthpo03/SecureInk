@@ -1,6 +1,7 @@
 import { Router } from "express";
 import prisma from "../config/prisma";
 import { authenticate, AuthRequest } from "../middleware/auth.middleware";
+import { sendSignatureRequest } from "../utils/sendSignatureRequest";
 
 const router = Router();
 
@@ -21,6 +22,19 @@ router.post("/", authenticate, async (req: AuthRequest, res) => {
       });
     }
 
+    const existingSigner = await prisma.signer.findFirst({
+      where: {
+        email,
+        documentId,
+      },
+    });
+
+    if (existingSigner) {
+      return res.status(409).json({
+        message: "Signer already invited",
+      });
+    }
+
     const signer = await prisma.signer.create({
       data: {
         email,
@@ -28,10 +42,12 @@ router.post("/", authenticate, async (req: AuthRequest, res) => {
       },
     });
 
+    await sendSignatureRequest(email, documentId);
+
     await prisma.auditLog.create({
       data: {
-        action: "DOCUMENT_UPLOADED",
-        documentId: document.id,
+        action: "SIGNER_INVITED",
+        documentId,
       },
     });
 
@@ -50,6 +66,9 @@ router.get("/:documentId", authenticate, async (req: AuthRequest, res) => {
     const signers = await prisma.signer.findMany({
       where: {
         documentId: req.params.documentId as string,
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
