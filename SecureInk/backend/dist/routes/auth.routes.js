@@ -8,6 +8,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const prisma_1 = __importDefault(require("../config/prisma"));
 const otp_1 = require("../utils/otp");
 const jwt_1 = require("../utils/jwt");
+const sendMail_1 = require("../utils/sendMail");
 const auth_middleware_1 = require("../middleware/auth.middleware");
 const router = (0, express_1.Router)();
 router.post("/register", async (req, res) => {
@@ -40,10 +41,10 @@ router.post("/register", async (req, res) => {
                 otpExpiry,
             },
         });
+        await (0, sendMail_1.sendOTP)(email, otp);
         return res.status(201).json({
-            message: "User created successfully",
+            message: "Account created. OTP sent to email.",
             userId: user.id,
-            otp,
         });
     }
     catch (error) {
@@ -153,6 +154,38 @@ router.get("/me", auth_middleware_1.authenticate, async (req, res) => {
         },
     });
     return res.json(user);
+});
+router.post("/resend-otp", async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await prisma_1.default.user.findUnique({
+            where: { email },
+        });
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+        const otp = (0, otp_1.generateOTP)();
+        const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+        await prisma_1.default.user.update({
+            where: { email },
+            data: {
+                otp,
+                otpExpiry,
+            },
+        });
+        await (0, sendMail_1.sendOTP)(email, otp);
+        return res.json({
+            message: "OTP sent successfully",
+        });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Server Error",
+        });
+    }
 });
 exports.default = router;
 //# sourceMappingURL=auth.routes.js.map

@@ -35,6 +35,12 @@ router.post("/upload", auth_middleware_1.authenticate, upload_middleware_1.defau
                 ownerId: req.userId,
             },
         });
+        await prisma_1.default.auditLog.create({
+            data: {
+                action: "DOCUMENT_UPLOADED",
+                documentId: document.id,
+            },
+        });
         return res.status(201).json({
             message: "Document uploaded successfully",
             document,
@@ -113,6 +119,50 @@ router.get("/:id/view", auth_middleware_1.authenticate, async (req, res) => {
         }
         return res.json({
             url: data.signedUrl,
+        });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Server Error",
+        });
+    }
+});
+router.delete("/:id", auth_middleware_1.authenticate, async (req, res) => {
+    try {
+        const id = req.params.id;
+        if (!id || Array.isArray(id)) {
+            return res.status(400).json({
+                message: "Invalid document id",
+            });
+        }
+        const document = await prisma_1.default.document.findFirst({
+            where: {
+                id,
+                ownerId: req.userId,
+            },
+        });
+        if (!document) {
+            return res.status(404).json({
+                message: "Document not found",
+            });
+        }
+        const { error } = await supabase_1.default.storage
+            .from("documents")
+            .remove([document.fileUrl]);
+        if (error) {
+            console.error(error);
+            return res.status(500).json({
+                message: "Failed to delete file",
+            });
+        }
+        await prisma_1.default.document.delete({
+            where: {
+                id,
+            },
+        });
+        return res.json({
+            message: "Document deleted successfully",
         });
     }
     catch (error) {
