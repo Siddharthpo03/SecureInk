@@ -43,6 +43,7 @@ const Login = () => {
           }),
         },
       );
+      console.log(import.meta.env.VITE_API_URL);
 
       const data = await response.json();
 
